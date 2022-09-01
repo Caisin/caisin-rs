@@ -2,7 +2,7 @@
 name = "caisin"
 version = "0.1.0"
 edition = "2021"
-repository=""
+repository = "https://github.com/Caisin/caisin-rs.git"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
