@@ -1,0 +1,22 @@
+[package]
+name = "code-gen"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+caisin={path="../../caisin"}
+clap = { version = "3.2.20", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+tokio = { version = "1.12", features = ["full"] }
+
+rbatis = "4.0.35"
+rbdc-mysql="0.1.15"
+rbs = { version = "0.1"}
+# logging(option)
+log = "0.4"
+fast_log = "1.5"
+anyhow = "1.0.64"
