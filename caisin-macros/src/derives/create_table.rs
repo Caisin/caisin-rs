@@ -5,7 +5,12 @@ use syn::{
     Path, Type, TypePath,
 };
 
-use crate::util::parse_attrs;
+use heck::ToSnakeCase;
+
+use crate::{
+    models::{self, TableInfo},
+    util::parse_attrs,
+};
 
 /// Method to derive an [CreateTable](caisin::CreateTable)
 pub fn expand_create_table(
@@ -14,11 +19,11 @@ pub fn expand_create_table(
     attrs: Vec<Attribute>,
 ) -> syn::Result<TokenStream> {
     let struct_name = ident.clone();
-    println!("ident========={:#?}", ident);
-    println!("data=========={:#?}", data);
-    println!("attrs=========={:#?}", attrs);
+    // println!("ident========={:#?}", ident);
+    // println!("data=========={:#?}", data);
+    // println!("attrs=========={:#?}", attrs);
     let ret_map = parse_attrs(&attrs, "caisin");
-    println!("ret_map=========={:#?}", ret_map);
+    // println!("ret_map=========={:#?}", ret_map);
 
     let fields = match data {
         Data::Struct(DataStruct {
@@ -33,10 +38,41 @@ pub fn expand_create_table(
     }
     .into_iter();
 
+    let mut tb_info = TableInfo {
+        name: struct_name.to_string().to_snake_case(),
+        comment: "".to_string(),
+        idxs: vec![],
+        pks: vec![],
+        fields: vec![],
+    };
+    for (k, v) in ret_map {
+        match k.as_str() {
+            "tbName" => {
+                tb_info.name = match v {
+                    Lit::Str(c) => c.token().to_string().replace("\n", ""),
+                    _ => "".to_owned(),
+                }
+            }
+            "comment" => {
+                tb_info.comment = match v {
+                    Lit::Str(c) => c.token().to_string().replace("\"", ""),
+                    _ => "".to_owned(),
+                }
+            }
+            _ => {}
+        }
+    }
     for ele in fields.to_owned() {
         let a = format_ident!("{}", ele.ident.unwrap());
-        println!("filed======{}", a);
         // println!("ele.ty======{:#?}", ele.ty);
+        let mut f = models::Field {
+            name: a.to_string(),
+            comment: "".to_string(),
+            is_pk: false,
+            is_idx: false,
+            db_type: "".to_string(),
+            size: 0,
+        };
         let col_typ = match ele.ty {
             Type::Path(p) => {
                 let f = p.path.segments.first().expect("col_type error").to_owned();
@@ -72,11 +108,39 @@ pub fn expand_create_table(
             }
             _ => todo!(),
         };
-        println!("col_typ==={}", col_typ);
+        f.db_type = col_typ.to_string();
         let ret_map = parse_attrs(&ele.attrs, "caisin");
-        println!("ret_map=========={:#?}", ret_map);
+
+        for (k, v) in ret_map {
+            match k.as_str() {
+                "comment" => {
+                    f.comment = match v {
+                        Lit::Str(c) => c.token().to_string().replace("\"", ""),
+                        _ => "".to_string(),
+                    };
+                }
+                "index" => {
+                    f.is_idx = true;
+                }
+                "pk" => {
+                    f.is_pk = true;
+                }
+                "size" => {
+                    f.size = match v {
+                        Lit::Int(c) => {
+                            let size: i32 = c.token().to_string().parse().expect("size 不是数字");
+                            size
+                        }
+                        _ => 0,
+                    };
+                }
+                _ => {}
+            }
+        }
+        tb_info.add_field(f.to_owned());
     }
 
+    println!("{:#?}", tb_info);
     Ok(quote!(
     impl #struct_name {
         pub fn create_table() {

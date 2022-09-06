@@ -14,3 +14,7 @@ proc-macro = true
 syn = { version = "^1", default-features = false, features = [ "full", "derive", "clone-impls", "parsing", "proc-macro", "printing", "extra-traits" ] }
 quote = "^1"
 proc-macro2 = "^1"
+serde = { version = "1", features = ["derive"] }
+
+# 字符串驼峰蛇形转换
+heck = "0.4"
