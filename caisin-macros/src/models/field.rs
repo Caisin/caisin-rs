@@ -29,4 +29,25 @@ impl TableInfo {
             self.idxs.push(f);
         }
     }
+    pub fn create_table_sql(&self) -> &str {
+        /* create table test
+        (
+            a int not null auto_increment default 0 comment '',
+            primary key (a),
+            index (a)
+        ) comment 'ces' */
+        let mut s = String::from("create table ");
+        s.push_str(&self.name);
+        s.push_str(" (\n");
+        for ele in &self.fields {
+            
+        }
+
+        ""
+    }
+    pub fn get_pk_str(&self) -> &str {
+        let s = String::new();
+        for ele in &self.pks {}
+        ""
+    }
 }
