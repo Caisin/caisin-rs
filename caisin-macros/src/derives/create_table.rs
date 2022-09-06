@@ -49,7 +49,7 @@ pub fn expand_create_table(
         match k.as_str() {
             "tbName" => {
                 tb_info.name = match v {
-                    Lit::Str(c) => c.token().to_string().replace("\n", ""),
+                    Lit::Str(c) => c.token().to_string().replace("\"", ""),
                     _ => "".to_owned(),
                 }
             }
@@ -65,9 +65,12 @@ pub fn expand_create_table(
     for ele in fields.to_owned() {
         let a = format_ident!("{}", ele.ident.unwrap());
         // println!("ele.ty======{:#?}", ele.ty);
-        let mut f = models::Field {
+        let mut tb_field = models::Field {
             name: a.to_string(),
             comment: "".to_string(),
+            def_value: "".to_string(),
+            auto_inc: false,
+            null_able: true,
             is_pk: false,
             is_idx: false,
             db_type: "".to_string(),
@@ -103,30 +106,40 @@ pub fn expand_create_table(
                     }
                     // println!("{}", )
                 } else {
+                    tb_field.null_able = false;
                     idt
                 }
             }
             _ => todo!(),
         };
-        f.db_type = col_typ.to_string();
+        tb_field.db_type = col_typ.to_string();
         let ret_map = parse_attrs(&ele.attrs, "caisin");
 
         for (k, v) in ret_map {
             match k.as_str() {
                 "comment" => {
-                    f.comment = match v {
+                    tb_field.comment = match v {
                         Lit::Str(c) => c.token().to_string().replace("\"", ""),
                         _ => "".to_string(),
                     };
                 }
+                "def_value" => {
+                    tb_field.def_value = match v {
+                        Lit::Str(c) => c.token().to_string(),
+                        _ => "".to_string(),
+                    };
+                }
                 "index" => {
-                    f.is_idx = true;
+                    tb_field.is_idx = true;
+                }
+                "auto_incr" => {
+                    tb_field.auto_inc = true;
                 }
                 "pk" => {
-                    f.is_pk = true;
+                    tb_field.is_pk = true;
                 }
                 "size" => {
-                    f.size = match v {
+                    tb_field.size = match v {
                         Lit::Int(c) => {
                             let size: i32 = c.token().to_string().parse().expect("size 不是数字");
                             size
@@ -137,10 +150,11 @@ pub fn expand_create_table(
                 _ => {}
             }
         }
-        tb_info.add_field(f.to_owned());
+        tb_info.add_field(tb_field.to_owned());
     }
 
-    println!("{:#?}", tb_info);
+    let sql=tb_info.create_table_sql();
+    println!( r#"{}"#,sql);
     Ok(quote!(
     impl #struct_name {
         pub fn create_table() {
