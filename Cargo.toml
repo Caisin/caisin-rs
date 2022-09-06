@@ -7,10 +7,16 @@ description = "caisin tools"
 license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+name="caisin"
+path="src/lib.rs"
+
+
 [dependencies]
 anyhow = "1.0.63"
 serde = "1.0.144"
 serde_json = "1.0.85"
+caisin-macros={path="caisin-macros"}
 
 [workspace]
-members = ["code-gen"]
+members = ["code-gen","caisin-macros"]

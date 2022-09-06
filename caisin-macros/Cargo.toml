@@ -1,0 +1,16 @@
+[package]
+name = "caisin-macros"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name="caisin_macros"
+path="src/lib.rs"
+proc-macro = true
+
+[dependencies]
+syn = { version = "^1", default-features = false, features = [ "full", "derive", "clone-impls", "parsing", "proc-macro", "printing", "extra-traits" ] }
+quote = "^1"
+proc-macro2 = "^1"

@@ -7,16 +7,19 @@ edition = "2021"
 
 [dependencies]
 caisin={path="../../caisin"}
+caisin-macros={path="../caisin-macros"}
 clap = { version = "3.2.20", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
 tokio = { version = "1.12", features = ["full"] }
 
-rbatis = "4.0.35"
+rbatis = "4"
 rbdc-mysql="0.1.15"
 rbs = { version = "0.1"}
 # logging(option)
 log = "0.4"
 fast_log = "1.5"
 anyhow = "1.0.64"
+# 字符串驼峰蛇形转换
+heck = "0.4"

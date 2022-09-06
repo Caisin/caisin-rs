@@ -1,6 +1,7 @@
 mod db;
 mod gen;
 mod models;
+mod gencode;
 use clap::Parser;
 use gen::gen_rbatis::gen_rbatis;
 #[macro_use]
