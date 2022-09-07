@@ -18,9 +18,9 @@ impl Field {
         let mut s = String::from("\t");
         s.push_str(&self.name);
         s.push_str(" ");
-        let db_typ = get_db_type_by_rs(self.db_type);
+        let db_typ = get_db_type_by_rs(&self.db_type);
         s.push_str(db_typ);
-        
+
         let size = match db_typ {
             "varchar" => 255,
             _ => self.size,
