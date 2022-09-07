@@ -10,13 +10,16 @@ extern crate rbatis;
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
-struct Args {
+pub struct Args {
     /// code generate type
     #[clap(short, long, value_parser, default_value = "rbatis")]
     gen_type: String,
     /// dburl
     #[clap(short, long, value_parser, required = true)]
     db_url: String,
+    /// 输出目录
+    #[clap(short, long, value_parser, default_value = "gencode")]
+    out_path: String,
 }
 
 #[tokio::main]
@@ -25,7 +28,7 @@ async fn main() {
 
     match &args.gen_type as &str {
         "rbatis" => {
-            gen_rbatis(args.db_url).await;
+            gen_rbatis(&args).await;
         }
         _ => {
             println!("unsupport gen type: [{}]", args.gen_type)

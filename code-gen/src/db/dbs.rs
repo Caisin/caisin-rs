@@ -1,8 +1,7 @@
 use super::super::models::{Filed, Table};
 use rbatis::Rbatis;
 
-
-#[sql("SELECT TABLE_NAME as name,TABLE_COMMENT as comment FROM information_schema.TABLES WHERE table_schema= ?")]
+#[sql(r#"SELECT TABLE_NAME as name,TABLE_COMMENT as comment FROM information_schema.TABLES WHERE table_schema= ?"#)]
 pub async fn get_tables(rb: &Rbatis, schema: &str) -> rbatis::Result<Vec<Table>> {
     impled!()
 }
@@ -29,8 +28,28 @@ pub async fn get_table_infos(rb: &Rbatis, schema: &str) -> Vec<Table> {
                     tb.fields = Some(res);
                 }
             }
+            println!("tbs.len=={}", tbs.len());
             tbs
         }
-        _ => vec![],
+        Err(e) => {
+            println!("{:#?}", e);
+            panic!("{}", e);
+            // vec![]
+        }
+    }
+}
+
+pub fn get_db_from_url(url: String) -> String {
+    let mut ed = url.len();
+    match url.find("?") {
+        Some(idx) => {
+            ed = idx;
+        }
+        None => {}
+    }
+    let url = &url[0..ed];
+    match url.split("/").last() {
+        Some(db) => db.to_string(),
+        None => "".to_string(),
     }
 }
