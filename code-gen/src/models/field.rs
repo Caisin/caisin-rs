@@ -1,3 +1,4 @@
+use caisin::get_rs_type_by_db;
 use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Filed {
@@ -23,18 +24,12 @@ pub struct Filed {
 
 impl Filed {
     pub fn get_rs_type_str(&self) -> String {
-        let rs_type = match self.get_db_type().as_str() {
-            "int" => "i32",
-            "bigint" => "i64",
-            "datetime" => "FastDateTime",
-            _ => "String",
-        };
+        let rs_type = get_rs_type_by_db(self.get_db_type());
 
         if let "YES" = self.null.as_str() {
             let mut s = String::from("Option<");
             s.push_str(rs_type);
             s.push_str(">");
-            // let s = s.as_str();
             s
         } else {
             rs_type.to_owned()

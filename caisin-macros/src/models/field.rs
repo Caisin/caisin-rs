@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-
+use caisin::get_db_type_by_rs;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Field {
     pub name: String,
@@ -18,13 +18,9 @@ impl Field {
         let mut s = String::from("\t");
         s.push_str(&self.name);
         s.push_str(" ");
-        let db_typ = match self.db_type.as_str() {
-            "i32" => "int",
-            "i64" => "bigint",
-            "DateTime" => "datetime",
-            _ => "varchar",
-        };
+        let db_typ = get_db_type_by_rs(self.db_type);
         s.push_str(db_typ);
+        
         let size = match db_typ {
             "varchar" => 255,
             _ => self.size,

@@ -16,5 +16,6 @@ quote = "^1"
 proc-macro2 = "^1"
 serde = { version = "1", features = ["derive"] }
 
+caisin={path="../"}
 # 字符串驼峰蛇形转换
 heck = "0.4"
