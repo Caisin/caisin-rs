@@ -117,7 +117,7 @@ impl TableInfo {
     }
     pub fn get_idx(&self) -> Vec<String> {
         let mut pk = Vec::new();
-        for ele in &self.pks {
+        for ele in &self.idxs {
             let mut s = String::new();
             s.push_str("\tindex(");
             s.push_str(&ele.name);

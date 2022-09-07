@@ -47,4 +47,14 @@ impl Filed {
         }
         db_type
     }
+    pub fn get_db_size(&self) -> String {
+        if self.typ.contains("(") {
+            if let Some(st) = self.typ.find("(") {
+                if let Some(ed) = self.typ.find(")") {
+                    return self.typ[(st + 1)..(ed - 1)].to_owned();
+                }
+            }
+        }
+        "".to_string()
+    }
 }

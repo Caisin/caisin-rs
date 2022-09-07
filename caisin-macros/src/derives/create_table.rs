@@ -154,6 +154,7 @@ pub fn expand_create_table(
     }
 
     let sql=tb_info.create_table_sql();
+    // println!( r#"{:#?}"#,tb_info);
     println!( r#"{}"#,sql);
     Ok(quote!(
     impl #struct_name {
