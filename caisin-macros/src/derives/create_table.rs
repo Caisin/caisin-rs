@@ -1,8 +1,7 @@
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, quote_spanned};
 use syn::{
-    punctuated::Punctuated, token::Comma, Attribute, Data, DataStruct, Field, Fields, Lit, Meta,
-    Path, Type, TypePath,
+    Attribute, Data, DataStruct, Fields, Lit, Type,
 };
 
 use heck::ToSnakeCase;
@@ -27,16 +26,16 @@ pub fn expand_create_table(
 
     let fields = match data {
         Data::Struct(DataStruct {
-            fields: Fields::Named(named),
-            ..
-        }) => named.named,
+                         fields: Fields::Named(named),
+                         ..
+                     }) => named.named,
         _ => {
             return Ok(quote_spanned! {
                 ident.span() => compile_error!("you can only derive DeriveActiveModel on structs");
             });
         }
     }
-    .into_iter();
+        .into_iter();
 
     let mut tb_info = TableInfo {
         name: struct_name.to_string().to_snake_case(),
@@ -153,13 +152,13 @@ pub fn expand_create_table(
         tb_info.add_field(tb_field.to_owned());
     }
 
-    let sql=tb_info.create_table_sql();
+    let sql = tb_info.create_table_sql();
     // println!( r#"{:#?}"#,tb_info);
-    println!( r#"{}"#,sql);
+    // println!( r#"{}"#,sql);
     Ok(quote!(
     impl #struct_name {
-        pub fn create_table() {
-            println!("create tabe fun");
+        pub fn create_table(&self)-> &str{
+                #sql
         }
      }
     ))
