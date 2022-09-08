@@ -13,11 +13,16 @@ pub async fn gen_rbatis(args: &Args) {
     let rb = init_db(&db_url);
     let db_name = get_db_from_url(db_url);
     let tbs = get_table_infos(&rb, db_name.as_str()).await;
+    //生成entity
+    gen_entitys(&tbs, args).await;
+}
+
+pub async fn gen_entitys(tbs: &Vec<Table>, args: &Args) {
     let mut mod_str = String::from("pub mod prelude;\n\n");
     let mut prelude_str = String::new();
 
     for tb in tbs {
-        gen_by_table(&tb, args).await;
+        gen_entity_by_table(tb, args).await;
         mod_str.push_str(format!("pub mod {};\n", tb.name).as_str());
         prelude_str.push_str(
             format!(
@@ -41,7 +46,7 @@ pub async fn gen_rbatis(args: &Args) {
     println!("data written to mod file");
 }
 
-pub async fn gen_by_table(tb: &Table, args: &Args) {
+pub async fn gen_entity_by_table(tb: &Table, args: &Args) {
     let mut tb = tb.clone();
     tb.pre_gen();
     let mut s = String::new();
