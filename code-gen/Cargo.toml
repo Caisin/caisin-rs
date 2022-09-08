@@ -14,7 +14,8 @@ serde_json = "1"
 
 tokio = { version = "1.12", features = ["full"] }
 
-rbatis ={version="4", features = ["debug_mode"]}
+# rbatis ={version="4", features = ["debug_mode"]}
+rbatis ={version="4"}
 rbdc-mysql="0.1.15"
 rbs = { version = "0.1"}
 # logging(option)

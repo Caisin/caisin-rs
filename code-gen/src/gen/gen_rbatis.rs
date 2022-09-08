@@ -11,11 +11,7 @@ use crate::{
 pub async fn gen_rbatis(args: &Args) {
     let db_url = args.db_url.to_owned();
     let rb = init_db(&db_url);
-    println!("rb===={:#?}", rb);
-    let r = rb.exec("select * from cps_user limit 10", Vec::new()).await;
-    println!("r===={:#?}", r);
     let db_name = get_db_from_url(db_url);
-    println!("db_name===={}", db_name);
     let tbs = get_table_infos(&rb, db_name.as_str()).await;
     let mut mod_str = String::from("pub mod prelude;\n\n");
     let mut prelude_str = String::new();

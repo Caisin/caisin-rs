@@ -28,7 +28,6 @@ pub async fn get_table_infos(rb: &Rbatis, schema: &str) -> Vec<Table> {
                     tb.fields = Some(res);
                 }
             }
-            println!("tbs.len=={}", tbs.len());
             tbs
         }
         Err(e) => {
