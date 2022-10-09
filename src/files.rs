@@ -1,10 +1,20 @@
 use std::{
-    fs::{read_dir, File},
+    fs::{read_dir, File, OpenOptions},
     path::Path,
 };
 
-use anyhow::{anyhow, Result};
-/// 创建文件
+/// 创建文件,文件存在会打开,往文件追加内容
+pub fn open_file(file_path: &str) -> File {
+    OpenOptions::new()
+        .read(true) // 可读
+        .write(true) // 可写
+        .append(true) // 追加内容
+        .create(true) // 新建，若文件存在则打开这个文件
+        .open(file_path)
+        .unwrap()
+}
+
+/// 创建新文件,文件存在会清空内容
 pub fn create_file(file_path: &str) -> Result<File, std::io::Error> {
     //创建父目录
     let path = Path::new(file_path);
