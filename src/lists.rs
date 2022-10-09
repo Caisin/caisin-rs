@@ -1,3 +1,7 @@
+use std::collections::HashMap;
+use std::hash::Hash;
+
+
 /// group slice分组
 pub fn group<K, V>(list: Vec<V>, kf: fn(t: &V) -> K) -> HashMap<K, Vec<V>>
 where
