@@ -1,5 +1,6 @@
 mod gen;
 mod models;
+mod dbs;
 // mod gencode;
 use clap::Parser;
 use gen::gen_rbatis::gen_rbatis;
