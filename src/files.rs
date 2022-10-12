@@ -69,3 +69,26 @@ pub fn list_file_name(dir_path: &str) -> Vec<String> {
     }
     ret
 }
+
+/// 列出目录下所有文件
+pub fn list_all_file(dir_path: &str, filter: fn(path: &String) -> bool) -> Vec<String> {
+    let mut ret = Vec::new();
+    if exists(dir_path) {
+        for ele in read_dir(dir_path).unwrap() {
+            let ele = ele.unwrap();
+            let metadata = ele.metadata().unwrap();
+            let path = ele.path().display().to_string();
+            let path = path.replace("\\", "/");
+            if metadata.is_dir() {
+                let mut files = list_all_file(path.as_str(), filter);
+                ret.append(&mut files);
+            }
+            if metadata.is_file() {
+                if filter(&path) {
+                    ret.push(path)
+                }
+            }
+        }
+    }
+    ret
+}

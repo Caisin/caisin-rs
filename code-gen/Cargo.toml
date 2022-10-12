@@ -16,7 +16,8 @@ tokio = { version = "1", features = ["full"] }
 
 # rbatis ={version="4", features = ["debug_mode"]}
 rbatis ={version="4"}
-rbdc-mysql="0.1.15"
+rbdc-mysql="0.1"
+rbdc-sqlite = { version = "0.1" }
 rbs = { version = "0.1"}
 # logging(option)
 log = "0.4"

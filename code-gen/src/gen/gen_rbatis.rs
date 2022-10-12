@@ -1,16 +1,12 @@
+use crate::{models::Table, Args};
+use caisin::dbs::{get_db_from_url, get_table_infos, init_db};
 use caisin::files::create_file;
 use heck::ToUpperCamelCase;
 use std::{io::Write, str::FromStr};
 
-use crate::{
-    db::dbs::{get_db_from_url, get_table_infos, init_db},
-    models::Table,
-    Args,
-};
-
 pub async fn gen_rbatis(args: &Args) {
     let db_url = args.db_url.to_owned();
-    let rb = init_db(&db_url);
+    let rb = init_db(&db_url).unwrap();
     let db_name = get_db_from_url(db_url);
     let tbs = get_table_infos(&rb, db_name.as_str()).await;
     //生成entity
@@ -114,13 +110,15 @@ pub async fn gen_mapper_by_table(tb: &Table, args: &Args) {
 }
 
 pub async fn gen_mod(args: &Args) {
-    let s = String::from_str(r#"
+    let s = String::from_str(
+        r#"
     pub mod entity;
     pub mod mapper;
-    "#).unwrap();
+    "#,
+    )
+    .unwrap();
 
-    let mut file = create_file(format!("{}/mod.rs", args.out_path).as_str())
-        .expect("create fail");
+    let mut file = create_file(format!("{}/mod.rs", args.out_path).as_str()).expect("create fail");
     file.write_all(s.as_bytes()).expect("write failed");
     println!("data written to file");
 }

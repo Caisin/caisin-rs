@@ -1,7 +1,6 @@
-mod db;
 mod gen;
 mod models;
-mod gencode;
+// mod gencode;
 use clap::Parser;
 use gen::gen_rbatis::gen_rbatis;
 #[macro_use]
@@ -34,4 +33,12 @@ async fn main() {
             println!("unsupport gen type: [{}]", args.gen_type)
         }
     }
+}
+
+#[test]
+fn hh() {
+    let url = "mysql://root:123456@localhost:3306/test";
+    let find = url.find("://").unwrap();
+    let db_type = &url[..find];
+    println!("{}", db_type);
 }

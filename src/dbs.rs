@@ -1,5 +1,8 @@
 use super::super::models::{Filed, Table};
+use anyhow::{anyhow, Result};
 use rbatis::Rbatis;
+use rbdc_mysql::driver::MysqlDriver;
+use rbdc_sqlite::driver::SqliteDriver;
 
 #[sql(r#"SELECT TABLE_NAME as name,TABLE_COMMENT as comment FROM information_schema.TABLES WHERE table_schema= ?"#)]
 pub async fn get_tables(rb: &Rbatis, schema: &str) -> rbatis::Result<Vec<Table>> {
@@ -12,10 +15,20 @@ pub async fn get_filed(rb: &Rbatis, table: &str) -> rbatis::Result<Vec<Filed>> {
 }
 
 /// 初始化数据源
-pub fn init_db(db_url: &String) -> Rbatis {
+pub fn init_db(db_url: &str) -> Result<Rbatis> {
     let rb = Rbatis::new();
-    rb.init(rbdc_mysql::driver::MysqlDriver {}, db_url).unwrap();
-    rb
+    let db_type = get_db_type(db_url);
+    match db_type as &str {
+        "mysql" => {
+            rb.init(MysqlDriver {}, db_url).unwrap();
+            Ok(rb)
+        }
+        "sqlite" => {
+            rb.init(SqliteDriver {}, db_url).unwrap();
+            Ok(rb)
+        }
+        _ => Err(anyhow!("不支持的数据库类型:{}", db_type)),
+    }
 }
 
 pub async fn get_table_infos(rb: &Rbatis, schema: &str) -> Vec<Table> {
@@ -38,6 +51,7 @@ pub async fn get_table_infos(rb: &Rbatis, schema: &str) -> Vec<Table> {
     }
 }
 
+/// 通过数据库连接url获取连接的数据库名称
 pub fn get_db_from_url(url: String) -> String {
     let mut ed = url.len();
     match url.find("?") {
@@ -51,4 +65,9 @@ pub fn get_db_from_url(url: String) -> String {
         Some(db) => db.to_string(),
         None => "".to_string(),
     }
+}
+/// 通过数据库连接url获取数据库类型
+pub fn get_db_type(url: &str) -> &str {
+    let find = url.find("://").unwrap();
+    &url[..find]
 }
