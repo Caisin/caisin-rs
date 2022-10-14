@@ -24,6 +24,8 @@ rbdc-mysql="0.1"
 rbdc-sqlite = { version = "0.1" }
 rbs = { version = "0.1"}
 
+rust-crypto = { version = "0.2" }
+
 tokio="1"
 [workspace]
 members = ["code-gen","caisin-macros"]

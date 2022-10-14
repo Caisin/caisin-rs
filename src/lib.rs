@@ -6,6 +6,7 @@ pub mod lists;
 pub mod maps;
 pub mod rs_db_mapping;
 pub mod times;
+pub mod cryptos;
 
 
 
