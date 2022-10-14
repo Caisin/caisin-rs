@@ -24,5 +24,6 @@ rbdc-mysql="0.1"
 rbdc-sqlite = { version = "0.1" }
 rbs = { version = "0.1"}
 
+tokio="1"
 [workspace]
 members = ["code-gen","caisin-macros"]

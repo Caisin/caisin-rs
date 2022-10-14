@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use chrono::{DateTime, NaiveDateTime, Utc, Local, Datelike};
+use chrono::{DateTime, NaiveDateTime, Utc};
 
 /// unix时间转datetime
 pub fn unix_str_2_date_time(s: &str) -> DateTime<Utc> {
@@ -27,12 +27,4 @@ pub fn get_hour_path(t: &DateTime<Utc>) -> String {
 
 pub fn get_date_path(t: &DateTime<Utc>) -> String {
     t.format("%Y/%m/%d").to_string()
-}
-
-#[test]
-fn test_t(){
-    let now = Local::now();
-    let year = now.year();
-    let month = now.month();
-    let day = now.day();
 }

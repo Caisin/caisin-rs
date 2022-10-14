@@ -1,4 +1,4 @@
-pub fn get_db_type_by_rs(rs_type: &str) -> &'static str {
+pub fn get_db_type_by_rs(rs_type: &str) -> &str {
     match rs_type {
         "bool" => "bool",
         "i8" => "tinyint",
@@ -11,7 +11,7 @@ pub fn get_db_type_by_rs(rs_type: &str) -> &'static str {
     }
 }
 
-pub fn get_rs_type_by_db(db_type: &str) -> &'static str {
+pub fn get_rs_type_by_db(db_type: &str) -> &str {
     match db_type {
         "float" => "f64",
         "bool" => "bool",

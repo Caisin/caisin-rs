@@ -24,8 +24,8 @@ pub struct Filed {
 
 impl Filed {
     pub fn get_rs_type_str(&self) -> String {
-        let rs_type = get_rs_type_by_db(&self.get_db_type());
-
+        let db_type = self.get_db_type();
+        let rs_type = get_rs_type_by_db(&db_type);
         if let "YES" = self.null.as_str() {
             let mut s = String::from("Option<");
             s.push_str(rs_type);

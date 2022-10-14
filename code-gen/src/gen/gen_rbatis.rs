@@ -1,12 +1,13 @@
+use crate::dbs::get_table_infos;
 use crate::{models::Table, Args};
-use caisin::dbs::{get_db_from_url, get_table_infos, init_db};
+use caisin::dbs::{get_db_from_url,  init_db};
 use caisin::files::create_file;
 use heck::ToUpperCamelCase;
 use std::{io::Write, str::FromStr};
 
 pub async fn gen_rbatis(args: &Args) {
     let db_url = args.db_url.to_owned();
-    let rb = init_db(&db_url).unwrap();
+    let rb = init_db(&db_url).await.unwrap();
     let db_name = get_db_from_url(db_url);
     let tbs = get_table_infos(&rb, db_name.as_str()).await;
     //生成entity
