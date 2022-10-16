@@ -1,5 +1,6 @@
 use std::{
     fs::{read_dir, File, OpenOptions},
+    io::{BufRead, BufReader},
     path::Path,
 };
 
@@ -91,4 +92,22 @@ pub fn list_all_file(dir_path: &str, filter: fn(path: &String) -> bool) -> Vec<S
         }
     }
     ret
+}
+
+pub fn read_line<T>(path: &str, deal_line: fn(line: String) -> T) -> Vec<T> {
+    let mut vec = Vec::new();
+    match File::open(path) {
+        Ok(input) => {
+            let buffered = BufReader::new(input);
+            for line in buffered.lines() {
+                if let Ok(s) = line {
+                    vec.push(deal_line(s));
+                }
+            }
+        }
+        Err(err) => {
+            println!("{err}");
+        }
+    }
+    vec
 }
