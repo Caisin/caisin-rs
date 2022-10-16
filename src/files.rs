@@ -1,9 +1,11 @@
 use std::{
     fs::{read_dir, File, OpenOptions},
-    io::{BufRead, BufReader},
+    io::SeekFrom,
+    io::{BufRead, BufReader, Read, Seek},
+    os::windows::prelude::{FileExt, MetadataExt},
     path::Path,
+    time::Instant,
 };
-
 /// 创建文件,文件存在会打开,往文件追加内容
 pub fn open_file(file_path: &str) -> File {
     OpenOptions::new()
@@ -110,4 +112,27 @@ pub fn read_line<T>(path: &str, deal_line: fn(line: String) -> T) -> Vec<T> {
         }
     }
     vec
+}
+
+/// 读取文件最后一行
+pub fn read_last_line(path: &str, buf_size: u64) -> Option<String> {
+    if let Ok(mut input) = File::open(path) {
+        //大文件读取最后一行优化
+        let metadata = input.metadata().unwrap();
+        let file_size = metadata.file_size();
+        if file_size > buf_size {
+            let start_idx = file_size - buf_size;
+            input.seek(SeekFrom::Start(start_idx)).unwrap();
+        }
+
+        let mut buf = String::new();
+        if let Ok(size) = input.read_to_string(&mut buf) {
+            if size > 0 {
+                if let Some(line) = buf.lines().last() {
+                    return Some(line.to_string());
+                }
+            }
+        }
+    }
+    None
 }

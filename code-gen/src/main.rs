@@ -1,6 +1,7 @@
 mod gen;
 mod models;
 mod dbs;
+use caisin::dbs::init_db;
 // mod gencode;
 use clap::Parser;
 use gen::gen_rbatis::gen_rbatis;
@@ -36,10 +37,4 @@ async fn main() {
     }
 }
 
-#[test]
-fn hh() {
-    let url = "mysql://root:123456@localhost:3306/test";
-    let find = url.find("://").unwrap();
-    let db_type = &url[..find];
-    println!("{}", db_type);
-}
+
