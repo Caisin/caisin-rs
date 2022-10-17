@@ -1,6 +1,12 @@
 use std::str::FromStr;
 
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Local, NaiveDateTime, Utc};
+
+pub static YMD: &str = "%Y%m%d";
+pub static YMD_PATH: &str = "%Y/%m/%d";
+pub static YMD_M: &str = "%Y-%m-%d";
+pub static DATE_TIME_M: &str = "%Y-%m-%d  %H:%M:%S";
+pub static YMDH_PATH: &str = "%Y/%m/%d/%H";
 
 /// unix时间转datetime
 pub fn unix_str_2_date_time(s: &str) -> DateTime<Utc> {
@@ -10,21 +16,29 @@ pub fn unix_str_2_date_time(s: &str) -> DateTime<Utc> {
     datetime
 }
 pub fn get_yyyymmdd(t: &DateTime<Utc>) -> String {
-    t.format("%Y%m%d").to_string()
+    t.format(YMD).to_string()
 }
 
 pub fn get_yyyy_mm_dd(t: &DateTime<Utc>) -> String {
-    t.format("%Y-%m-%d").to_string()
+    t.format(YMD_M).to_string()
 }
 
 pub fn get_date_time(t: &DateTime<Utc>) -> String {
-    t.format("%Y-%m-%d %H:%M:%S").to_string()
+    t.format(DATE_TIME_M).to_string()
 }
 
 pub fn get_hour_path(t: &DateTime<Utc>) -> String {
-    t.format("%Y/%m/%d/%H").to_string()
+    t.format(YMDH_PATH).to_string()
 }
 
 pub fn get_date_path(t: &DateTime<Utc>) -> String {
-    t.format("%Y/%m/%d").to_string()
+    t.format(YMD_PATH).to_string()
+}
+
+pub fn get_sys_date_path() -> String {
+    Local::now().format(YMD_PATH).to_string()
+}
+
+pub fn get_sys_date_time() -> String {
+    Local::now().format(DATE_TIME_M).to_string()
 }
