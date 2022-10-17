@@ -141,3 +141,21 @@ pub fn read_last_line(path: &str, buf_size: u64) -> Option<String> {
     }
     None
 }
+
+/// 获取文件行数
+pub fn line_size(path: &str) -> usize {
+    if let Ok(f) = File::open(path) {
+        let metadata = f.metadata().unwrap();
+        let file_size = metadata.file_size();
+        if file_size > 0 {
+            let buffered = BufReader::new(f);
+            return buffered.lines().count();
+        }
+    }
+    0
+}
+
+#[test]
+fn test_size(){
+println!("{}",line_size("E:/data/datacenter/test/cps_member_device/wx28.data"))
+}
