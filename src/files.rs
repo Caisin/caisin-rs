@@ -2,12 +2,12 @@ use std::{
     fs::{read_dir, File, OpenOptions},
     io::SeekFrom,
     io::{BufRead, BufReader, Read, Seek},
-    os::windows::prelude::{FileExt, MetadataExt},
+    os::windows::prelude::MetadataExt,
     path::Path,
-    time::Instant,
 };
 /// 创建文件,文件存在会打开,往文件追加内容
 pub fn open_file(file_path: &str) -> File {
+    create_pdir(file_path);
     OpenOptions::new()
         .read(true) // 可读
         .write(true) // 可写
@@ -17,14 +17,19 @@ pub fn open_file(file_path: &str) -> File {
         .unwrap()
 }
 
-/// 创建新文件,文件存在会清空内容
-pub fn create_file(file_path: &str) -> Result<File, std::io::Error> {
+/// 创建父文件夹
+pub fn create_pdir(file_path: &str) {
     //创建父目录
     let path = Path::new(file_path);
     let prefix = path.parent().unwrap();
     if !prefix.exists() {
         std::fs::create_dir_all(prefix).unwrap();
     }
+}
+/// 创建新文件,文件存在会清空内容
+pub fn create_file(file_path: &str) -> Result<File, std::io::Error> {
+    //创建父目录
+    create_pdir(file_path);
     File::create(file_path)
 }
 
