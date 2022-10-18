@@ -1,5 +1,4 @@
 use std::{
-    fmt::Debug,
     fs::{read_dir, File, OpenOptions},
     io::SeekFrom,
     io::{BufRead, BufReader, Read, Seek},
