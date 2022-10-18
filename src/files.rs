@@ -1,11 +1,10 @@
 use anyhow::Result;
 use std::{
-    fs::{read_dir, File, OpenOptions},
+    fs::{read_dir, File, OpenOptions, self},
     io::SeekFrom,
     io::{BufRead, BufReader, Read, Seek},
-    os::windows::prelude::MetadataExt,
     path::Path,
-    str::FromStr,
+    str::FromStr, 
 };
 
 /// 创建文件,文件存在会打开,往文件追加内容
@@ -131,9 +130,9 @@ pub fn read_line<T>(path: &str, deal_line: fn(line: String) -> Option<T>) -> Vec
 /// 读取文件最后一行
 pub fn read_last_line(path: &str, buf_size: u64) -> Option<String> {
     if let Ok(mut input) = File::open(path) {
+        let meta = fs::symlink_metadata(&path).unwrap();
         //大文件读取最后一行优化
-        let metadata = input.metadata().unwrap();
-        let file_size = metadata.file_size();
+        let file_size = meta.len();
         if file_size > buf_size {
             let start_idx = file_size - buf_size;
             input.seek(SeekFrom::Start(start_idx)).unwrap();
@@ -154,8 +153,9 @@ pub fn read_last_line(path: &str, buf_size: u64) -> Option<String> {
 /// 获取文件行数
 pub fn line_size(path: &str) -> usize {
     if let Ok(f) = File::open(path) {
-        let metadata = f.metadata().unwrap();
-        let file_size = metadata.file_size();
+        let meta = fs::symlink_metadata(&path).unwrap();
+        let file_size = meta.len();
+        println!("size={file_size}");
         if file_size > 0 {
             let buffered = BufReader::new(f);
             return buffered.lines().count();
