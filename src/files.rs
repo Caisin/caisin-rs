@@ -1,3 +1,4 @@
+use anyhow::Result;
 use std::{
     fs::{read_dir, File, OpenOptions},
     io::SeekFrom,
@@ -6,6 +7,7 @@ use std::{
     path::Path,
     str::FromStr,
 };
+
 /// 创建文件,文件存在会打开,往文件追加内容
 pub fn open_file(file_path: &str) -> File {
     create_pdir(file_path);
@@ -102,14 +104,20 @@ pub fn list_all_file(dir_path: &str, filter: fn(path: &String) -> bool) -> Vec<S
     ret
 }
 
-pub fn read_line<T>(path: &str, deal_line: fn(line: String) -> T) -> Vec<T> {
+pub fn read_line<T>(path: &str, deal_line: fn(line: String) -> Option<T>) -> Vec<T> {
     let mut vec = Vec::new();
     match File::open(path) {
         Ok(input) => {
             let buffered = BufReader::new(input);
             for line in buffered.lines() {
                 if let Ok(s) = line {
-                    vec.push(deal_line(s));
+                    let value = deal_line(s);
+                    match value {
+                        Some(v) => {
+                            vec.push(v);
+                        }
+                        None => {}
+                    }
                 }
             }
         }
@@ -164,7 +172,13 @@ where
     let files = list_all_file(path, filter);
     let mut all = Vec::new();
     for ele in files {
-        let mut items = read_line(&ele, |s| -> T { T::from_str(&s).unwrap_or_default() });
+        let mut items = read_line(&ele, |s| match T::from_str(&s) {
+            Ok(t) => Some(t),
+            Err(_) => {
+                println!("line {s} pase err");
+                None
+            }
+        });
         all.append(&mut items);
     }
     all
