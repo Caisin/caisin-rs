@@ -1,10 +1,10 @@
 use anyhow::Result;
 use std::{
-    fs::{read_dir, File, OpenOptions, self},
+    fs::{self, read_dir, File, OpenOptions},
     io::SeekFrom,
     io::{BufRead, BufReader, Read, Seek},
     path::Path,
-    str::FromStr, 
+    str::FromStr,
 };
 
 /// 创建文件,文件存在会打开,往文件追加内容
@@ -172,16 +172,24 @@ where
     let files = list_all_file(path, filter);
     let mut all = Vec::new();
     for ele in files {
-        let mut items = read_line(&ele, |s| match T::from_str(&s) {
-            Ok(t) => Some(t),
-            Err(_) => {
-                println!("line {s} pase err");
-                None
-            }
-        });
+        let mut items = load_file(&ele);
         all.append(&mut items);
     }
     all
+}
+
+// 加载文件
+pub fn load_file<T>(path: &str) -> Vec<T>
+where
+    T: FromStr + Default,
+{
+    read_line(path, |s| match T::from_str(&s) {
+        Ok(t) => Some(t),
+        Err(_) => {
+            println!("line {s} pase err");
+            None
+        }
+    })
 }
 
 #[test]
