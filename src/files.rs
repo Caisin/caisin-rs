@@ -1,9 +1,11 @@
 use std::{
+    fmt::Debug,
     fs::{read_dir, File, OpenOptions},
     io::SeekFrom,
     io::{BufRead, BufReader, Read, Seek},
     os::windows::prelude::MetadataExt,
     path::Path,
+    str::FromStr,
 };
 /// 创建文件,文件存在会打开,往文件追加内容
 pub fn open_file(file_path: &str) -> File {
@@ -155,7 +157,24 @@ pub fn line_size(path: &str) -> usize {
     0
 }
 
+// 加载目录文件
+pub fn load<T>(path: &str, filter: fn(path: &String) -> bool) -> Vec<T>
+where
+    T: FromStr + Default,
+{
+    let files = list_all_file(path, filter);
+    let mut all = Vec::new();
+    for ele in files {
+        let mut items = read_line(&ele, |s| -> T { T::from_str(&s).unwrap_or_default() });
+        all.append(&mut items);
+    }
+    all
+}
+
 #[test]
-fn test_size(){
-println!("{}",line_size("E:/data/datacenter/test/cps_member_device/wx28.data"))
+fn test_size() {
+    println!(
+        "{}",
+        line_size("E:/data/datacenter/test/cps_member_device/wx28.data")
+    )
 }

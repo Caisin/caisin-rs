@@ -1,7 +1,7 @@
+mod dbs;
 mod gen;
 mod models;
-mod dbs;
-use caisin::dbs::init_db;
+use caisin::{dbs::init_db, bars};
 // mod gencode;
 use clap::Parser;
 use gen::gen_rbatis::gen_rbatis;
@@ -25,7 +25,7 @@ pub struct Args {
 
 #[tokio::main]
 async fn main() {
-    let args = Args::parse();
+    /* let args = Args::parse();
 
     match &args.gen_type as &str {
         "rbatis" => {
@@ -34,7 +34,7 @@ async fn main() {
         _ => {
             println!("unsupport gen type: [{}]", args.gen_type)
         }
-    }
+    } */
+    bars::print_use_time();
+    
 }
-
-
