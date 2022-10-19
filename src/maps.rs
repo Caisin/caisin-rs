@@ -12,17 +12,18 @@ where
     ret
 }
 
-pub fn group_by_value<K, V>(m: HashMap<K, V>) -> HashMap<V, Vec<K>>
+pub fn group_by_value<K, V>(m: &HashMap<K, V>) -> HashMap<V, Vec<K>>
 where
-    V: Eq + Hash,
+    V: Eq + Hash + Clone,
+    K: Clone,
 {
     let mut ret: HashMap<V, Vec<K>> = HashMap::new();
     for (k, v) in m {
-        if ret.contains_key(&v) {
-            let keys = ret.get_mut(&v).unwrap();
-            keys.push(k);
+        if ret.contains_key(v) {
+            let keys = ret.get_mut(v).unwrap();
+            keys.push(k.clone());
         } else {
-            ret.insert(v, vec![k]);
+            ret.insert(v.clone(), vec![k.clone()]);
         }
     }
     ret
