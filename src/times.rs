@@ -50,12 +50,19 @@ pub fn get_date_path(t: &DateTime<Utc>) -> String {
 pub fn get_sys_date_path() -> String {
     Local::now().format(YMD_PATH).to_string()
 }
+pub fn get_yesterday_date_path() -> String {
+    get_yesterday().format(YMD_PATH).to_string()
+}
 
 pub fn get_sys_date_time() -> String {
     Local::now().format(DATE_TIME_M).to_string()
 }
+
+pub fn get_yesterday() -> DateTime<Utc> {
+    add_day(&sys_date_time(), -1)
+}
+
 pub fn sys_date_time() -> DateTime<Utc> {
     let naive_utc = Local::now().naive_utc();
     DateTime::from_utc(naive_utc, Utc)
 }
-
