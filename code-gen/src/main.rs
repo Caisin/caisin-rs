@@ -1,10 +1,13 @@
 mod dbs;
 mod gen;
 mod models;
-use caisin::{dbs::init_db, bars};
+use caisin::{bars, dbs::init_db};
 // mod gencode;
 use clap::Parser;
 use gen::gen_rbatis::gen_rbatis;
+use rbatis::Rbatis;
+use rbdc_mysql::driver::MysqlDriver;
+use rbs::to_value;
 #[macro_use]
 extern crate rbatis;
 
@@ -25,16 +28,31 @@ pub struct Args {
 
 #[tokio::main]
 async fn main() {
-    /* let args = Args::parse();
+    let uids = vec![1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    match &args.gen_type as &str {
-        "rbatis" => {
-            gen_rbatis(&args).await;
+    //wx28="mysql://quick2_cswangmwl:c4wnd7Xwj8nSf6WA@8.136.203.80:3306/quick2_cswangmwl?ssl-mode=disabled"
+
+    let user_type = 2;
+    let rb = Rbatis::new();
+    rb.init(MysqlDriver {}, "mysql://root:root@127.0.0.1:3306/test")
+        .unwrap();
+
+    let chunks = uids.chunks(3);
+    for sub_uids in chunks {
+        let join = sub_uids.to_vec();
+        let mut ids = vec![];
+        for ele in join {
+            ids.push(ele.to_string());
         }
-        _ => {
-            println!("unsupport gen type: [{}]", args.gen_type)
-        }
-    } */
-    bars::print_use_time();
-    
+        let ids_str = ids.join(",");
+        let sql = format!("update cps_member set userType=? where uid in ({ids_str})");
+        match rb.exec(&sql, vec![to_value!(user_type)]).await {
+            Ok(o) => {
+                println!("{o}");
+            }
+            Err(e) => {
+                println!("{e}");
+            }
+        };
+    }
 }
