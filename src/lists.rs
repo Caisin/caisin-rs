@@ -1,9 +1,6 @@
 use std::collections::HashMap;
 use std::hash::Hash;
 
-use rbatis::Rbatis;
-use rbdc_mysql::driver::MysqlDriver;
-use rbs::to_value;
 
 /// group slice分组
 pub fn group<K, V>(list: &Vec<V>, kf: fn(t: &V) -> K) -> HashMap<K, Vec<V>>

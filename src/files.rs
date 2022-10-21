@@ -199,3 +199,37 @@ fn test_size() {
         line_size("E:/data/datacenter/test/cps_member_device/wx28.data")
     )
 }
+
+// 按行加载文件
+pub fn load_file_by_line<T>(path: &str, t: &mut T, line_fn: fn(line: String, t: &mut T)) {
+    match File::open(path) {
+        Ok(input) => {
+            let buffered = BufReader::new(input);
+            for line in buffered.lines() {
+                if let Ok(line) = line {
+                    line_fn(line, t);
+                }
+            }
+        }
+        Err(err) => {
+            println!("{err}");
+        }
+    }
+}
+
+// 加载目录文件
+pub fn load_by_line<T>(
+    //加载目录
+    path: &str,
+    //过滤器
+    filter: fn(path: &String) -> bool,
+    //数据
+    t: &mut T,
+    //处理行数据方法
+    line_fn: fn(line: String, t: &mut T),
+) {
+    let files = list_all_file(path, filter);
+    for ele in files {
+        load_file_by_line(&ele, t, line_fn);
+    }
+}
