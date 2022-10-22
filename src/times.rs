@@ -9,13 +9,13 @@ pub static DATE_TIME_M: &str = "%Y-%m-%d  %H:%M:%S";
 pub static YMDH_PATH: &str = "%Y/%m/%d/%H";
 
 /// unix时间转datetime
-pub fn unix_str_2_local_date_time(s: &str) -> DateTime<Local> {
+pub fn unix_str_2_utc8_date_time(s: &str) -> DateTime<Local> {
     let secs = i64::from_str(s).unwrap();
-    unix_2_local_date_time(secs)
+    unix_2_utc8_date_time(secs)
 }
 
 /// unix时间转datetime
-pub fn unix_2_local_date_time(s: i64) -> DateTime<Local> {
+pub fn unix_2_utc8_date_time(s: i64) -> DateTime<Local> {
     let naive_datetime = NaiveDateTime::from_timestamp(s, 0);
     let east = FixedOffset::east(8 * 3600);
     let datetime: DateTime<Local> = DateTime::from_utc(naive_datetime, east);
