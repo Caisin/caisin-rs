@@ -127,12 +127,17 @@ pub fn read_line<T>(path: &str, deal_line: fn(line: String) -> Option<T>) -> Vec
     vec
 }
 
+/// 文件大小
+pub fn file_size(path: &str) -> u64 {
+    let meta = fs::symlink_metadata(path).unwrap();
+    meta.len()
+}
+
 /// 读取文件最后一行
 pub fn read_last_line(path: &str, buf_size: u64) -> Option<String> {
     if let Ok(mut input) = File::open(path) {
-        let meta = fs::symlink_metadata(&path).unwrap();
         //大文件读取最后一行优化
-        let file_size = meta.len();
+        let file_size = file_size(path);
         if file_size > buf_size {
             let start_idx = file_size - buf_size;
             input.seek(SeekFrom::Start(start_idx)).unwrap();
@@ -153,8 +158,7 @@ pub fn read_last_line(path: &str, buf_size: u64) -> Option<String> {
 /// 获取文件行数
 pub fn line_size(path: &str) -> usize {
     if let Ok(f) = File::open(path) {
-        let meta = fs::symlink_metadata(&path).unwrap();
-        let file_size = meta.len();
+        let file_size = file_size(path);
         println!("size={file_size}");
         if file_size > 0 {
             let buffered = BufReader::new(f);
