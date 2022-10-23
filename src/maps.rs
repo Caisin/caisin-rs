@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::sync::{Arc, Mutex};
 /// map 转换
 pub fn trans_map<K, V, T>(m: &HashMap<K, V>, vf: fn(v: &V) -> T) -> HashMap<K, T>
 where
@@ -48,4 +49,8 @@ where
         }
     }
     ret
+}
+
+pub fn arc_map<K, V>() -> Arc<Mutex<HashMap<K, V>>> {
+    Arc::new(Mutex::new(HashMap::new()))
 }

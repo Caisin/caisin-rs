@@ -1,10 +1,10 @@
 mod dbs;
 mod gen;
 mod models;
-use caisin::{bars, dbs::init_db};
+
 // mod gencode;
 use clap::Parser;
-use gen::gen_rbatis::gen_rbatis;
+
 use rbatis::Rbatis;
 use rbdc_mysql::driver::MysqlDriver;
 use rbs::to_value;
