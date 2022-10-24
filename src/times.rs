@@ -12,11 +12,11 @@ pub static YMD_PATH_HMM: &str = "%Y/%m/%d %H:%M:%S";
 pub static ZERO_HMM: &str = "00:00:00";
 pub static SPACE: &str = " ";
 
-fn utc(i: i32) -> FixedOffset {
+pub fn utc(i: i32) -> FixedOffset {
     FixedOffset::east(i * 3600)
 }
 
-fn utc8() -> FixedOffset {
+pub fn utc8() -> FixedOffset {
     utc(8)
 }
 
@@ -169,7 +169,9 @@ pub fn parse_date_time(arg: &str) -> NaiveDateTime {
 
 #[test]
 fn test_time() {
-    let t = parse_date_time("2022-01-01 00:00:00");
-    let t = t.and_local_timezone(utc8()).unwrap();
-    println!("{t:?}")
+    let t = parse_date("2022/10/24");
+    let start = t.and_hms(0, 0, 0).and_local_timezone(utc8());
+    let end = t.and_hms(23, 59, 59).and_local_timezone(utc8());
+    println!("{start:?}\n{end:?}");
+    
 }
