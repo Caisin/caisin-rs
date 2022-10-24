@@ -142,22 +142,18 @@ pub fn read_last_line(path: &str, buf_size: u64) -> Option<String> {
                 let start_idx = file_size - buf_size;
                 input.seek(SeekFrom::Start(start_idx)).unwrap();
             }
-            let mut buf = String::new();
-            match input.read_to_string(&mut buf) {
-                Ok(size) => {
-                    if size > 0 {
-                        if let Some(line) = buf.lines().last() {
-                            println!("{line}");
-                            return Some(line.to_string());
-                        }
+            let bf = BufReader::new(input);
+            match bf.lines().last() {
+                Some(line) => match line {
+                    Ok(l) => {
+                        return Some(l);
                     }
-                    println!("{size}");
-                    return None;
-                }
-                Err(err) => {
-                    eprintln!("{err}");
-                    None
-                }
+                    Err(err) => {
+                        println!("seek 失败 {err}");
+                        None
+                    }
+                },
+                None => None,
             }
         }
         Err(err) => {
