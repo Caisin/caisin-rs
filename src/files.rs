@@ -2,7 +2,7 @@ use anyhow::Result;
 use std::{
     fs::{self, read_dir, File, OpenOptions},
     io::SeekFrom,
-    io::{BufRead, BufReader, Read, Seek},
+    io::{BufRead, BufReader, Seek},
     path::Path,
     str::FromStr,
 };
@@ -129,15 +129,19 @@ pub fn read_line<T>(path: &str, deal_line: fn(line: String) -> Option<T>) -> Vec
 
 /// 文件大小
 pub fn file_size(path: &str) -> u64 {
-    let meta = fs::symlink_metadata(path).unwrap();
-    meta.len()
+    if exists(path) {
+        let meta = fs::symlink_metadata(path).unwrap();
+        meta.len()
+    } else {
+        0
+    }
 }
 
 /// 读取文件最后一行
 pub fn read_last_line(path: &str, buf_size: u64) -> Option<String> {
-    let file_size = file_size(path);
     match File::open(path) {
         Ok(mut input) => {
+            let file_size = file_size(path);
             if file_size > buf_size {
                 let start_idx = file_size - buf_size;
                 input.seek(SeekFrom::Start(start_idx)).unwrap();
