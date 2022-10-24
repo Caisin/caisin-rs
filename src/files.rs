@@ -147,6 +147,7 @@ pub fn read_last_line(path: &str, buf_size: u64) -> Option<String> {
                 Ok(size) => {
                     if size > 0 {
                         if let Some(line) = buf.lines().last() {
+                            println!("{line}");
                             return Some(line.to_string());
                         }
                     }
