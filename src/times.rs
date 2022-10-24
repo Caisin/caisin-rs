@@ -169,9 +169,14 @@ pub fn parse_date_time(arg: &str) -> NaiveDateTime {
 
 #[test]
 fn test_time() {
-    let t = parse_date("2022/10/24");
-    let start = t.and_hms(0, 0, 0).and_local_timezone(utc8());
-    let end = t.and_hms(23, 59, 59).and_local_timezone(utc8());
-    println!("{start:?}\n{end:?}");
+    // let t = parse_date("2022/10/24");
+    // let start = t.and_hms(0, 0, 0).and_local_timezone(utc8());
+    // let end = t.and_hms(23, 59, 59).and_local_timezone(utc8());
+    // println!("{start:?}\n{end:?}");
+
+    let a = unix_2_date_time(1666454400);
+    println!("{a:?}");
+    let t = unix_2_date_time(1666540799);
+    println!("{t:?}");
     
 }

@@ -135,24 +135,35 @@ pub fn file_size(path: &str) -> u64 {
 
 /// 读取文件最后一行
 pub fn read_last_line(path: &str, buf_size: u64) -> Option<String> {
-    if let Ok(mut input) = File::open(path) {
-        //大文件读取最后一行优化
-        let file_size = file_size(path);
-        if file_size > buf_size {
-            let start_idx = file_size - buf_size;
-            input.seek(SeekFrom::Start(start_idx)).unwrap();
-        }
-
-        let mut buf = String::new();
-        if let Ok(size) = input.read_to_string(&mut buf) {
-            if size > 0 {
-                if let Some(line) = buf.lines().last() {
-                    return Some(line.to_string());
+    let file_size = file_size(path);
+    match File::open(path) {
+        Ok(mut input) => {
+            if file_size > buf_size {
+                let start_idx = file_size - buf_size;
+                input.seek(SeekFrom::Start(start_idx)).unwrap();
+            }
+            let mut buf = String::new();
+            match input.read_to_string(&mut buf) {
+                Ok(size) => {
+                    if size > 0 {
+                        if let Some(line) = buf.lines().last() {
+                            return Some(line.to_string());
+                        }
+                    }
+                    println!("{size}");
+                    return None;
+                }
+                Err(err) => {
+                    eprintln!("{err}");
+                    None
                 }
             }
         }
+        Err(err) => {
+            eprintln!("打开文件{path}失败,{err}");
+            None
+        }
     }
-    None
 }
 
 /// 获取文件行数
