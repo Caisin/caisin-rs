@@ -160,8 +160,8 @@ pub fn read_last_line(path: &str, buf_size: u64) -> Option<String> {
                 None => None,
             }
         }
-        Err(err) => {
-            eprintln!("打开文件{path}失败,{err}");
+        Err(_) => {
+            // eprintln!("打开文件{path}失败,{err}");
             None
         }
     }
