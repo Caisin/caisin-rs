@@ -8,11 +8,11 @@ use std::{
     time::{Duration, Instant},
 };
 pub struct Bar {
-    arc_bol: Arc<AtomicBool>,
+    switch: Arc<AtomicBool>,
 }
 impl Bar {
     pub fn close(&mut self) {
-        self.arc_bol.fetch_and(false, Ordering::Relaxed);
+        self.switch.fetch_and(false, Ordering::Relaxed);
     }
 }
 
@@ -39,5 +39,5 @@ pub fn print_use_time(pre: &str) -> Bar {
         sw.write_fmt(format_args!("\r{str}")).unwrap();
         sw.flush().unwrap();
     });
-    Bar { arc_bol: bar }
+    Bar { switch: bar }
 }
