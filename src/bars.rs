@@ -22,19 +22,20 @@ impl Drop for Bar {
     }
 }
 
-pub fn print_use_time() -> Bar {
+pub fn print_use_time(pre: &str) -> Bar {
     let now = Instant::now();
     let bar = Arc::new(AtomicBool::new(true));
     let arc = bar.clone();
+    let pre = pre.to_string();
     tokio::spawn(async move {
         let mut sw = BufWriter::new(io::stdout());
         while arc.load(Ordering::Relaxed) {
-            let str = format!("耗时:{:?}", now.elapsed());
+            let str = format!("{pre}{:?}", now.elapsed());
             sw.write_fmt(format_args!("\r{str}")).unwrap();
             sw.flush().unwrap();
             sleep(Duration::from_millis(400));
         }
-        let str = format!("耗时:{:?}", now.elapsed());
+        let str = format!("{pre}{:?}", now.elapsed());
         sw.write_fmt(format_args!("\r{str}")).unwrap();
         sw.flush().unwrap();
     });
