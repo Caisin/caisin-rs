@@ -2,7 +2,7 @@ use anyhow::Result;
 use std::{
     fs::{self, read_dir, File, OpenOptions},
     io::SeekFrom,
-    io::{BufRead, BufReader, Seek},
+    io::{BufRead, BufReader, Seek, Write},
     path::Path,
     str::FromStr,
 };
@@ -101,6 +101,48 @@ pub fn list_all_file(dir_path: &str, filter: fn(path: &String) -> bool) -> Vec<S
         }
     }
     ret
+}
+/// 根据指定行数分割文件
+pub fn splite_file_by_lines(path: &str, out_path: &str, splite_lines: i32) -> Vec<String> {
+    let (_, name, ext) = file_path_attr(path);
+    let mut new_files = vec![];
+    match File::open(path) {
+        Ok(input) => {
+            let buffered = BufReader::new(input);
+            let mut lines = 0;
+            let mut str = String::new();
+            for line in buffered.lines() {
+                if let Ok(s) = line {
+                    str.push_str(&s);
+                    str.push_str("\n");
+                    lines += 1;
+                    if lines > 0 && lines % splite_lines == 0 {
+                        let new_file_name =
+                            format!("{out_path}/{name}_{}_{lines}.{ext}", lines - splite_lines);
+                        create_file(&new_file_name)
+                            .unwrap()
+                            .write_all(str.as_bytes())
+                            .unwrap();
+                        str.clear();
+                        new_files.push(new_file_name);
+                    }
+                }
+            }
+            if !str.is_empty() {
+                let new_file_name =
+                    format!("{out_path}/{name}_{}_{lines}.{ext}", lines - splite_lines);
+                create_file(&new_file_name)
+                    .unwrap()
+                    .write_all(str.as_bytes())
+                    .unwrap();
+                new_files.push(new_file_name);
+            }
+        }
+        Err(err) => {
+            println!("{err}");
+        }
+    }
+    new_files
 }
 
 pub fn read_line<T>(path: &str, deal_line: fn(line: String) -> Option<T>) -> Vec<T> {
@@ -207,13 +249,13 @@ where
         }
     })
 }
-
-#[test]
-fn test_size() {
-    println!(
-        "{}",
-        line_size("E:/data/datacenter/test/cps_member_device/wx28.data")
-    )
+/// 获取文件目录,文件名,拓展名
+pub fn file_path_attr(file_path: &str) -> (&str, &str, &str) {
+    let path = Path::new(file_path);
+    let dir = path.parent().unwrap().to_str().unwrap();
+    let name = path.file_stem().unwrap().to_str().unwrap();
+    let ext = path.extension().unwrap().to_str().unwrap();
+    (dir, name, ext)
 }
 
 // 按行加载文件
