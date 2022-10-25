@@ -2,12 +2,15 @@ mod dbs;
 mod gen;
 mod models;
 
+use std::{sync::atomic::Ordering, thread::sleep, time::Duration};
+
+use caisin::bars;
 // mod gencode;
 use clap::Parser;
 
 use rbatis::Rbatis;
 use rbdc_mysql::driver::MysqlDriver;
-use rbs::Value;
+use rbs::{to_value, Value};
 #[macro_use]
 extern crate rbatis;
 
@@ -28,18 +31,30 @@ pub struct Args {
 
 #[tokio::main]
 async fn main() {
+    let bl = bars::print_use_time();
     //wx28="mysql://quick2_cswangmwl:c4wnd7Xwj8nSf6WA@8.136.203.80:3306/quick2_cswangmwl?ssl-mode=disabled"
     fast_log::init(fast_log::Config::new().console()).expect("rbatis init fail");
 
     let rb = Rbatis::new();
-    rb.init(MysqlDriver {}, "mysql://root:root@127.0.0.1:3306/go-admin")
+    rb.init(MysqlDriver {}, "mysql://root:root@127.0.0.1:3306/test")
         .unwrap();
 
-    let sql = "select * from sys_menu where";
-    let args: Vec<Value> = vec![];
-    let var_name = vec![1, 2, 3, 4, 5];
-    for item in var_name.chunks(2) {
-        let (sql, args) = caisin::dbs::sql_in(sql, "menu_id", &args, item.to_vec());
-        let _ = caisin::dbs::fetch_map_list(&rb, sql.as_str(), args).await;
+    let list = vec![1, 2, 3, 4, 5];
+
+    let chunks = list.chunks(2);
+    let sql = "update cps_member set userType=? where";
+    let args = vec![to_value!(2)];
+    for sub_uids in chunks {
+        let (sql, exec_args) = caisin::dbs::sql_in(sql, "uid", &args, sub_uids.to_vec());
+        match rb.exec(&sql, exec_args).await {
+            Ok(o) => {
+                println!("{o}");
+            }
+            Err(e) => {
+                println!("{e}");
+            }
+        };
     }
+    sleep(Duration::from_secs(1));
+    bars::close(bl);
 }

@@ -1,18 +1,33 @@
 use std::{
     io::{self, BufWriter, Write},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
     thread::sleep,
     time::{Duration, Instant},
 };
+type Bar = Arc<AtomicBool>;
 
-pub fn print_use_time() {
+pub fn close(bar: Bar) {
+    bar.fetch_and(false, Ordering::Relaxed);
+}
+
+pub fn print_use_time() -> Bar {
     let now = Instant::now();
+    let bar = Arc::new(AtomicBool::new(true));
+    let arc = bar.clone();
     tokio::spawn(async move {
         let mut sw = BufWriter::new(io::stdout());
-        loop {
+        while arc.load(Ordering::Relaxed) {
             let str = format!("耗时:{:?}", now.elapsed());
             sw.write_fmt(format_args!("\r{str}")).unwrap();
             sw.flush().unwrap();
             sleep(Duration::from_millis(400));
         }
+        let str = format!("耗时:{:?}", now.elapsed());
+        sw.write_fmt(format_args!("\r{str}")).unwrap();
+        sw.flush().unwrap();
     });
+    bar
 }
