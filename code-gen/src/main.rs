@@ -31,7 +31,7 @@ pub struct Args {
 
 #[tokio::main]
 async fn main() {
-    let bl = bars::print_use_time();
+    let print_use_time = bars::print_use_time();
     //wx28="mysql://quick2_cswangmwl:c4wnd7Xwj8nSf6WA@8.136.203.80:3306/quick2_cswangmwl?ssl-mode=disabled"
     fast_log::init(fast_log::Config::new().console()).expect("rbatis init fail");
 
@@ -56,5 +56,4 @@ async fn main() {
         };
     }
     sleep(Duration::from_secs(1));
-    bars::close(bl);
 }

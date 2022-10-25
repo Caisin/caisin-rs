@@ -8,6 +8,7 @@ pub mod rs_db_mapping;
 pub mod times;
 pub mod cryptos;
 pub mod bars;
+pub mod defer;
 
 
 

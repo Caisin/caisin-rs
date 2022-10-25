@@ -7,10 +7,19 @@ use std::{
     thread::sleep,
     time::{Duration, Instant},
 };
-type Bar = Arc<AtomicBool>;
+pub struct Bar {
+    arc_bol: Arc<AtomicBool>,
+}
+impl Bar {
+    pub fn close(&mut self) {
+        self.arc_bol.fetch_and(false, Ordering::Relaxed);
+    }
+}
 
-pub fn close(bar: Bar) {
-    bar.fetch_and(false, Ordering::Relaxed);
+impl Drop for Bar {
+    fn drop(&mut self) {
+        self.close()
+    }
 }
 
 pub fn print_use_time() -> Bar {
@@ -29,5 +38,5 @@ pub fn print_use_time() -> Bar {
         sw.write_fmt(format_args!("\r{str}")).unwrap();
         sw.flush().unwrap();
     });
-    bar
+    Bar { arc_bol: bar }
 }
