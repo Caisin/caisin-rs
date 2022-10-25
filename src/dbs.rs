@@ -1,7 +1,10 @@
+use std::collections::HashMap;
+
 use anyhow::{anyhow, Result};
 use rbatis::Rbatis;
 use rbdc_mysql::driver::MysqlDriver;
 use rbdc_sqlite::driver::SqliteDriver;
+use rbs::{to_value, Value};
 
 /// 初始化数据源
 pub async fn init_db(db_url: &str) -> Result<Rbatis> {
@@ -43,4 +46,35 @@ pub fn get_db_from_url(url: String) -> String {
 pub fn get_db_type(url: &str) -> &str {
     let find = url.find("://").unwrap();
     &url[..find]
+}
+/// 获取map list
+pub async fn fetch_map_list(
+    rb: &Rbatis,
+    sql: &str,
+    args: Vec<rbs::Value>,
+) -> rbatis::Result<Vec<HashMap<String, rbs::Value>>> {
+    rb.fetch_decode(sql, args).await
+}
+
+/// 将sql转为in参数
+pub fn sql_in<T: serde::Serialize>(
+    sql: &str,
+    field: &str,
+    args: &Vec<Value>,
+    in_ids: Vec<T>,
+) -> (String, Vec<Value>) {
+    let mut els = vec![];
+    let mut ret_args = args.clone();
+    for ele in in_ids {
+        ret_args.push(to_value!(ele));
+        els.push("?");
+    }
+    let mut sql = String::from(sql);
+    let join = els.join(",");
+    sql.push_str(" ");
+    sql.push_str(field);
+    sql.push_str(" in(");
+    sql.push_str(join.as_str());
+    sql.push_str(") ");
+    (sql, ret_args)
 }

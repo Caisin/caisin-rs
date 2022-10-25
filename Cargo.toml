@@ -1,6 +1,6 @@
 [package]
 name = "caisin"
-version = "0.1.28"
+version = "0.1.29"
 edition = "2021"
 repository = "https://github.com/Caisin/caisin-rs.git"
 description = "caisin tools"
@@ -13,7 +13,7 @@ path="src/lib.rs"
 
 
 [dependencies]
-anyhow = "1.0.63"
+anyhow = "1"
 # 日期
 chrono = "0.4"
 serde = { version="1", features = ["derive"] }

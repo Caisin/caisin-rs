@@ -7,7 +7,7 @@ use clap::Parser;
 
 use rbatis::Rbatis;
 use rbdc_mysql::driver::MysqlDriver;
-use rbs::to_value;
+use rbs::Value;
 #[macro_use]
 extern crate rbatis;
 
@@ -28,31 +28,18 @@ pub struct Args {
 
 #[tokio::main]
 async fn main() {
-    let uids = vec![1, 2, 3, 4, 5, 6, 7, 8, 9];
-
     //wx28="mysql://quick2_cswangmwl:c4wnd7Xwj8nSf6WA@8.136.203.80:3306/quick2_cswangmwl?ssl-mode=disabled"
+    fast_log::init(fast_log::Config::new().console()).expect("rbatis init fail");
 
-    let user_type = 2;
     let rb = Rbatis::new();
-    rb.init(MysqlDriver {}, "mysql://root:root@127.0.0.1:3306/test")
+    rb.init(MysqlDriver {}, "mysql://root:root@127.0.0.1:3306/go-admin")
         .unwrap();
 
-    let chunks = uids.chunks(3);
-    for sub_uids in chunks {
-        let join = sub_uids.to_vec();
-        let mut ids = vec![];
-        for ele in join {
-            ids.push(ele.to_string());
-        }
-        let ids_str = ids.join(",");
-        let sql = format!("update cps_member set userType=? where uid in ({ids_str})");
-        match rb.exec(&sql, vec![to_value!(user_type)]).await {
-            Ok(o) => {
-                println!("{o}");
-            }
-            Err(e) => {
-                println!("{e}");
-            }
-        };
+    let sql = "select * from sys_menu where";
+    let args: Vec<Value> = vec![];
+    let var_name = vec![1, 2, 3, 4, 5];
+    for item in var_name.chunks(2) {
+        let (sql, args) = caisin::dbs::sql_in(sql, "menu_id", &args, item.to_vec());
+        let _ = caisin::dbs::fetch_map_list(&rb, sql.as_str(), args).await;
     }
 }

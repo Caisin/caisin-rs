@@ -54,10 +54,7 @@ pub fn list_dir_name(dir_path: &str) -> Vec<String> {
         for ele in read_dir(dir_path).unwrap() {
             let ele = ele.unwrap();
             if ele.metadata().unwrap().is_dir() {
-                let file_name = format!("{:?}", ele.file_name());
-                let len = &file_name.len();
-                let var_name = file_name[1..len - 1].to_string();
-                ret.push(var_name)
+                ret.push(ele.file_name().to_str().unwrap().to_string())
             }
         }
     }
@@ -71,9 +68,7 @@ pub fn list_file_name(dir_path: &str) -> Vec<String> {
         for ele in read_dir(dir_path).unwrap() {
             let ele = ele.unwrap();
             if ele.metadata().unwrap().is_file() {
-                let file_name = format!("{:?}", ele.file_name());
-                let var_name = file_name[1..file_name.len() - 1].to_string();
-                ret.push(var_name)
+                ret.push(ele.file_name().to_str().unwrap().to_string())
             }
         }
     }
