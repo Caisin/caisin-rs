@@ -1,6 +1,6 @@
-pub struct Defer<F: Fn()>(F);
+pub struct Defer<F: FnMut()>(pub F);
 
-impl<F: Fn()> Drop for Defer<F> {
+impl<F: FnMut()> Drop for Defer<F> {
     fn drop(&mut self) {
         (self.0)()
     }

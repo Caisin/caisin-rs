@@ -9,6 +9,7 @@ pub mod times;
 pub mod cryptos;
 pub mod bars;
 pub mod defer;
+pub mod db2file;
 
 
 

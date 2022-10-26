@@ -78,3 +78,79 @@ pub fn sql_in<T: serde::Serialize>(
     sql.push_str(") ");
     (sql, ret_args)
 }
+
+/**
+gorm named sql支持
+# Examples
+
+```
+    use caisin::dbs::named_sql_expr;
+    use std::collections::HashMap;
+
+    use anyhow::{anyhow, Result};
+    use rbs::{to_value, Value};
+    let sql = "select * from user where id=@id and cuid=@cuid and name='你好' and hh=? and gp=? and a='?'";
+    let old_args = vec![to_value!("haha"), to_value!("goupi"), to_value!("xx")];
+    let mut named_args: HashMap<String, Value> = HashMap::new();
+    named_args.insert("id".to_string(), to_value!(1));
+    named_args.insert("cuid".to_string(), to_value!("adad1da"));
+    match named_sql_expr(sql, old_args, named_args) {
+        Ok((ret_sql, ret_args)) => {
+            assert_eq!(&ret_sql, "select * from user where id=? and cuid=? and name='你好' and hh=? and gp=? and a='?'");
+            assert_eq!(ret_args, vec![to_value!(1),to_value!("adad1da"),to_value!("haha"), to_value!("goupi")]);
+        }
+        Err(err) => {
+            println!("fail:{err}")
+        }
+    }
+```
+*/
+pub fn named_sql_expr(
+    sql: &str,
+    mut old_args: Vec<Value>,
+    named_args: HashMap<String, Value>,
+) -> Result<(String, Vec<Value>)> {
+    let mut ret_args = vec![];
+    let mut start_idx = 0;
+    let mut idx = 0;
+    let mut ret_sql = String::new();
+    let mut in_cma = false;
+    old_args.reverse();
+    for c in sql.chars() {
+        if c == '@' && start_idx == 0 {
+            start_idx = idx;
+            ret_sql.push('?');
+        }
+        if c == '\'' {
+            in_cma = !in_cma;
+        }
+        if c == ' ' && start_idx > 0 {
+            let name = &sql[start_idx + 1..idx];
+            start_idx = 0;
+            match named_args.get(name) {
+                Some(value) => ret_args.push(value.clone()),
+                None => {
+                    return Err(anyhow!("key {name} not exists!"));
+                }
+            }
+        }
+        if c == '?' && !in_cma {
+            match old_args.pop() {
+                Some(value) => {
+                    ret_args.push(value);
+                }
+                None => {
+                    return Err(anyhow!("old param num not enough"));
+                }
+            }
+        }
+        if start_idx == 0 {
+            ret_sql.push(c);
+        }
+        idx += 1;
+    }
+    Ok((ret_sql, ret_args))
+}
+
+#[test]
+fn test_sql() {}

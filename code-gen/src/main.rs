@@ -8,7 +8,7 @@ use caisin::bars;
 // mod gencode;
 use clap::Parser;
 
-use rbatis::Rbatis;
+use rbatis::{Rbatis, executor::RbatisRef};
 use rbdc_mysql::driver::MysqlDriver;
 use rbs::{to_value, Value};
 #[macro_use]
@@ -31,9 +31,9 @@ pub struct Args {
 
 #[tokio::main]
 async fn main() {
-    let _bar = bars::print_use_time("测试耗时:");
+     let _print_use_time = bars::print_use_time("测试耗时:");
     //wx28="mysql://quick2_cswangmwl:c4wnd7Xwj8nSf6WA@8.136.203.80:3306/quick2_cswangmwl?ssl-mode=disabled"
-    fast_log::init(fast_log::Config::new().console()).expect("rbatis init fail");
+    // fast_log::init(fast_log::Config::new().console()).expect("rbatis init fail");
 
     let rb = Rbatis::new();
     rb.init(MysqlDriver {}, "mysql://root:root@127.0.0.1:3306/test")
@@ -46,14 +46,19 @@ async fn main() {
     let args = vec![to_value!(2)];
     for sub_uids in chunks {
         let (sql, exec_args) = caisin::dbs::sql_in(sql, "uid", &args, sub_uids.to_vec());
-        match rb.exec(&sql, exec_args).await {
-            Ok(o) => {
-                println!("{o}");
-            }
-            Err(e) => {
-                println!("{e}");
-            }
-        };
+        let rb=rb.clone();
+        tokio::spawn(async move{
+            let var_name = format!("{exec_args:?}耗时:");
+            let _b=bars::print_use_time(&var_name);
+            match rb.exec(&sql, exec_args).await {
+                Ok(o) => {
+                    println!("{o}");
+                }
+                Err(e) => {
+                    println!("{e}");
+                }
+            };
+        });
     }
     sleep(Duration::from_secs(1));
 }
